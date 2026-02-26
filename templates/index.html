@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Eye Anemia Detection</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            font-family: Arial;
+            color: white;
+            text-align: center;
+            padding: 40px;
+        }
+        .card {
+            max-width: 400px;
+            margin: auto;
+            background: #111;
+            padding: 30px;
+            border-radius: 12px;
+        }
+        input, button {
+            margin-top: 20px;
+            padding: 12px;
+            width: 100%;
+        }
+        button {
+            background: #00ffb3;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>👀 Eye Anemia Detection</h1>
+    <div class="card">
+        <form action="/predict" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" required>
+            <button type="submit">Predict</button>
+        </form>
+    </div>
+</body>
+</html>
