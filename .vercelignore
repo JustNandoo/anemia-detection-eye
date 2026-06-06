@@ -1,0 +1,14 @@
+.git
+.idea
+.venv
+venv
+__pycache__
+*.pyc
+.DS_Store
+dataset
+Test-images
+static/uploads
+static/gradcam
+static/shap
+assets/Screenshot*.png
+train_model.py

@@ -1,5 +1,7 @@
 import os
 import shutil
+import base64
+import uuid
 import cv2
 import tensorflow as tf
 import uvicorn
@@ -21,7 +23,7 @@ model = tf.keras.models.load_model("model/best_model_mobileNetV2.keras")
 # model = tf.keras.models.load_model("model/fire_today_2.keras")
 
 
-UPLOAD_DIR = "static/uploads"
+UPLOAD_DIR = "/tmp/uploads" if os.environ.get("VERCEL") else "static/uploads"
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
@@ -32,6 +34,16 @@ EYE_DETECTOR = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_eye_tr
 
 def allowed_file(filename: str):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def image_to_data_url(image_path: str, filename: str) -> str:
+    extension = filename.rsplit(".", 1)[1].lower()
+    mime_type = "image/png" if extension == "png" else "image/jpeg"
+
+    with open(image_path, "rb") as image_file:
+        encoded = base64.b64encode(image_file.read()).decode("ascii")
+
+    return f"data:{mime_type};base64,{encoded}"
 
 
 def is_eye_area_image(image_path: str) -> bool:
@@ -123,7 +135,9 @@ async def predict(request: Request, file: UploadFile = File(...)):
             }
         )
 
-    image_path = os.path.join(UPLOAD_DIR, file.filename)
+    extension = file.filename.rsplit(".", 1)[1].lower()
+    safe_filename = f"{uuid.uuid4().hex}.{extension}"
+    image_path = os.path.join(UPLOAD_DIR, safe_filename)
 
     with open(image_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
@@ -166,14 +180,14 @@ async def predict(request: Request, file: UploadFile = File(...)):
 
     return templates.TemplateResponse(
         request,
-        "result.html",
-        {
-            "label": label,
-            "confidence": f"{confidence:.2f}",
-            "image": image_path
-        }
-    )
+            "result.html",
+            {
+                "label": label,
+                "confidence": f"{confidence:.2f}",
+                "image": image_to_data_url(image_path, file.filename)
+            }
+        )
 
 
 if __name__ == "__main__":
-    uvicorn.run("app1:app", host="127.0.0.1", port=5000, reload=True)
+    uvicorn.run("app:app", host="127.0.0.1", port=5000, reload=True)
