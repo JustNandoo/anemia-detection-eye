@@ -164,8 +164,8 @@
             gap: 9px;
             padding: 9px 13px;
             border-radius: 999px;
-            background: {% if label == "Anemic" %}#fff1ee{% else %}#e4f8f1{% endif %};
-            color: {% if label == "Anemic" %}#b84432{% else %}#087864{% endif %};
+            background: {% if label == "Anemia" %}#fff1ee{% else %}#e4f8f1{% endif %};
+            color: {% if label == "Anemia" %}#b84432{% else %}#087864{% endif %};
             font-weight: 800;
         }
 
@@ -236,41 +236,35 @@
 
         .content-grid {
             display: grid;
-            grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+            grid-template-columns: minmax(320px, 0.82fr) minmax(0, 1.18fr);
             gap: 24px;
             align-items: start;
         }
 
-        .image-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 16px;
-        }
-
         .image-card {
             overflow: hidden;
-            padding: 14px;
+            padding: 20px;
             animation: riseIn 0.7s ease both;
         }
 
         .image-card h3 {
-            margin: 4px 2px 12px;
-            font-size: 16px;
+            margin: 4px 2px 14px;
+            font-size: 24px;
         }
 
         .image-card img {
             width: 100%;
-            aspect-ratio: 1;
+            aspect-ratio: 4 / 5;
             object-fit: cover;
-            border-radius: 16px;
+            border-radius: 20px;
             background: #eaf3f2;
         }
 
         .image-card p {
-            margin: 10px 2px 2px;
+            margin: 14px 2px 2px;
             color: var(--muted);
-            font-size: 13px;
-            line-height: 1.45;
+            font-size: 15px;
+            line-height: 1.55;
         }
 
         .tips-card {
@@ -366,10 +360,6 @@
             .content-grid {
                 grid-template-columns: 1fr;
             }
-
-            .image-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
         }
 
         @media (max-width: 640px) {
@@ -395,9 +385,16 @@
             }
 
             .metrics,
-            .image-grid,
             .audio-actions {
                 grid-template-columns: 1fr;
+            }
+
+            .image-card h3 {
+                font-size: 21px;
+            }
+
+            .image-card img {
+                aspect-ratio: 1;
             }
 
             .step {
@@ -443,7 +440,7 @@
                     <h2>Audio Result</h2>
                     <p id="audioText">
                         Hasil klasifikasi menunjukkan status {{ label }} dengan tingkat confidence {{ confidence }} persen.
-                        {% if label == "Anemic" %}
+                        {% if label == "Anemia" %}
                         Disarankan untuk memperhatikan gejala seperti mudah lelah, pusing, pucat, sesak napas, atau jantung berdebar, lalu konsultasi dengan tenaga kesehatan untuk pemeriksaan lanjutan.
                         {% else %}
                         Tetap jaga pola makan bergizi, cukupi kebutuhan zat besi, vitamin B12, folat, dan lakukan pemeriksaan kesehatan bila muncul gejala.
@@ -458,33 +455,15 @@
         </section>
 
         <section class="content-grid">
-            <div class="image-grid">
-                <div class="image-card">
-                    <h3>Uploaded Image</h3>
-                    <img src="/{{ image }}" alt="Uploaded Image">
-                    <p>Gambar input yang digunakan untuk proses klasifikasi.</p>
-                </div>
-
-                {% if gradcam %}
-                <div class="image-card">
-                    <h3>Grad-CAM++</h3>
-                    <img src="/{{ gradcam }}" alt="Grad-CAM Image">
-                    <p>Area visual yang paling memengaruhi keputusan model.</p>
-                </div>
-                {% endif %}
-
-                {% if shap_explainer %}
-                <div class="image-card">
-                    <h3>SHAP Explanation</h3>
-                    <img src="/{{ shap_explainer }}" alt="SHAP Explanation">
-                    <p>Kontribusi piksel terhadap prediksi model.</p>
-                </div>
-                {% endif %}
+            <div class="image-card">
+                <h3>Uploaded Image</h3>
+                <img src="/{{ image }}" alt="Uploaded Image">
+                <p>Gambar input yang digunakan untuk proses klasifikasi anemia.</p>
             </div>
 
             <aside class="tips-card">
-                {% if label == "Anemic" %}
-                <h2>Langkah Awal Jika Terdeteksi Anemic</h2>
+                {% if label == "Anemia" %}
+                <h2>Langkah Awal Jika Terdeteksi Anemia</h2>
                 <p>
                     Gunakan hasil ini sebagai sinyal awal. Diagnosis anemia tetap membutuhkan pemeriksaan
                     seperti hemoglobin, ferritin, zat besi, vitamin B12, atau folat sesuai arahan dokter.
@@ -515,14 +494,14 @@
                         <div class="step-number">4</div>
                         <div>
                             <strong>Konsultasi ke dokter</strong>
-                            <span>Segera periksa bila gejala mengganggu aktivitas, sesak, nyeri dada, pingsan, menstruasi sangat berat, atau hasil screening berulang menunjukkan Anemic.</span>
+                            <span>Segera periksa bila gejala mengganggu aktivitas, sesak, nyeri dada, pingsan, menstruasi sangat berat, atau hasil screening berulang menunjukkan Anemia.</span>
                         </div>
                     </div>
                 </div>
                 {% else %}
-                <h2>Tips Menjaga Kondisi Tetap Non-Anemic</h2>
+                <h2>Tips Menjaga Kondisi Tetap Tidak Anemia</h2>
                 <p>
-                    Hasil Non-Anemic adalah sinyal baik, tetapi tetap perlu menjaga nutrisi dan memantau
+                    Hasil Tidak Anemia adalah sinyal baik, tetapi tetap perlu menjaga nutrisi dan memantau
                     gejala karena anemia dapat dipengaruhi pola makan, perdarahan, atau kondisi kesehatan lain.
                 </p>
                 <div class="steps">
