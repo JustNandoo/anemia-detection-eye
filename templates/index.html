@@ -10,34 +10,235 @@
             color: white;
             text-align: center;
             padding: 40px;
+            margin: 0;
         }
         .card {
-            max-width: 400px;
+            max-width: 520px;
             margin: auto;
             background: #111;
             padding: 30px;
             border-radius: 12px;
+            box-shadow: 0 0 18px rgba(0, 0, 0, 0.35);
         }
         input, button {
             margin-top: 20px;
             padding: 12px;
             width: 100%;
+            box-sizing: border-box;
         }
         button {
             background: #00ffb3;
             border: none;
             font-size: 16px;
             cursor: pointer;
+            font-weight: bold;
+        }
+        button.secondary {
+            background: transparent;
+            color: #00ffb3;
+            border: 1px solid #00ffb3;
+        }
+        button.danger {
+            background: transparent;
+            color: #ff8a8a;
+            border: 1px solid #ff8a8a;
+        }
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 24px 0 4px;
+            color: #b8c5c9;
+            font-size: 14px;
+        }
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #34484f;
+        }
+        .camera-box {
+            display: none;
+            margin-top: 18px;
+        }
+        video,
+        canvas,
+        .preview {
+            width: 100%;
+            max-height: 360px;
+            border-radius: 10px;
+            background: black;
+            object-fit: cover;
+        }
+        canvas,
+        .preview {
+            display: none;
+        }
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .status {
+            min-height: 20px;
+            margin-top: 14px;
+            color: #ffd166;
+            font-size: 14px;
+        }
+        @media (max-width: 560px) {
+            body {
+                padding: 24px 14px;
+            }
+            .card {
+                padding: 22px;
+            }
+            .actions {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <h1>👀 Eye Anemia Detection</h1>
     <div class="card">
-        <form action="/predict" method="post" enctype="multipart/form-data">
-            <input type="file" name="file" required>
+        <form id="predictForm" action="/predict" method="post" enctype="multipart/form-data">
+            <input id="fileInput" type="file" name="file" accept="image/png,image/jpeg" capture="environment" required>
             <button type="submit">Predict</button>
         </form>
+
+        <div class="divider">atau</div>
+
+        <button id="startCamera" class="secondary" type="button">Buka Kamera</button>
+
+        <div id="cameraBox" class="camera-box">
+            <video id="cameraVideo" autoplay playsinline></video>
+            <canvas id="cameraCanvas"></canvas>
+            <img id="photoPreview" class="preview" alt="Captured photo preview">
+
+            <div class="actions">
+                <button id="capturePhoto" type="button">Ambil Foto</button>
+                <button id="retakePhoto" class="secondary" type="button">Ulangi</button>
+            </div>
+
+            <button id="predictPhoto" type="button">Predict dari Foto</button>
+            <button id="stopCamera" class="danger" type="button">Tutup Kamera</button>
+        </div>
+
+        <div id="cameraStatus" class="status"></div>
     </div>
+
+    <script>
+        const form = document.getElementById("predictForm");
+        const fileInput = document.getElementById("fileInput");
+        const startCameraButton = document.getElementById("startCamera");
+        const stopCameraButton = document.getElementById("stopCamera");
+        const capturePhotoButton = document.getElementById("capturePhoto");
+        const retakePhotoButton = document.getElementById("retakePhoto");
+        const predictPhotoButton = document.getElementById("predictPhoto");
+        const cameraBox = document.getElementById("cameraBox");
+        const video = document.getElementById("cameraVideo");
+        const canvas = document.getElementById("cameraCanvas");
+        const preview = document.getElementById("photoPreview");
+        const statusText = document.getElementById("cameraStatus");
+
+        let stream = null;
+        let capturedFile = null;
+
+        function setStatus(message) {
+            statusText.textContent = message;
+        }
+
+        function setFileFromCapture(file) {
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            fileInput.files = dataTransfer.files;
+        }
+
+        async function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach((track) => track.stop());
+                stream = null;
+            }
+            video.srcObject = null;
+        }
+
+        startCameraButton.addEventListener("click", async () => {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                setStatus("Browser tidak mendukung akses kamera.");
+                return;
+            }
+
+            try {
+                await stopCamera();
+                capturedFile = null;
+                preview.style.display = "none";
+                canvas.style.display = "none";
+                video.style.display = "block";
+                cameraBox.style.display = "block";
+
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: "environment" },
+                    audio: false
+                });
+                video.srcObject = stream;
+                setStatus("Kamera aktif. Arahkan ke area mata lalu ambil foto.");
+            } catch (error) {
+                setStatus("Tidak bisa membuka kamera. Pastikan izin kamera diberikan.");
+            }
+        });
+
+        capturePhotoButton.addEventListener("click", () => {
+            if (!stream || !video.videoWidth) {
+                setStatus("Kamera belum siap.");
+                return;
+            }
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob((blob) => {
+                if (!blob) {
+                    setStatus("Foto gagal dibuat. Coba ulangi.");
+                    return;
+                }
+
+                const filename = `camera_${Date.now()}.jpg`;
+                capturedFile = new File([blob], filename, { type: "image/jpeg" });
+                setFileFromCapture(capturedFile);
+                preview.src = URL.createObjectURL(blob);
+                preview.style.display = "block";
+                video.style.display = "none";
+                setStatus("Foto siap diprediksi.");
+            }, "image/jpeg", 0.92);
+        });
+
+        retakePhotoButton.addEventListener("click", () => {
+            capturedFile = null;
+            fileInput.value = "";
+            preview.style.display = "none";
+            video.style.display = "block";
+            setStatus("Silakan ambil foto ulang.");
+        });
+
+        predictPhotoButton.addEventListener("click", () => {
+            if (!capturedFile) {
+                setStatus("Ambil foto dulu sebelum prediksi.");
+                return;
+            }
+            form.requestSubmit();
+        });
+
+        stopCameraButton.addEventListener("click", async () => {
+            await stopCamera();
+            cameraBox.style.display = "none";
+            setStatus("");
+        });
+
+        form.addEventListener("submit", () => {
+            stopCamera();
+        });
+    </script>
 </body>
 </html>

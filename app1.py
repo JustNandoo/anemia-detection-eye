@@ -38,7 +38,7 @@ def allowed_file(filename: str):
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse(request, "index.html")
 
 
 @app.post("/predict", response_class=HTMLResponse)
@@ -47,9 +47,9 @@ async def predict(request: Request, file: UploadFile = File(...)):
     # 🔐 FILE FORMAT VALIDATION
     if not allowed_file(file.filename):
         return templates.TemplateResponse(
+            request,
             "error.html",
             {
-                "request": request,
                 "message": "❌ Invalid file format. Please upload JPG, PNG, or JPEG images only."
             }
         )
@@ -70,9 +70,9 @@ async def predict(request: Request, file: UploadFile = File(...)):
 
     except UnidentifiedImageError:
         return templates.TemplateResponse(
+            request,
             "error.html",
             {
-                "request": request,
                 "message": "❌ Uploaded file is not a valid image.<br> Please upload a correct image file."
             }
         )
@@ -95,9 +95,9 @@ async def predict(request: Request, file: UploadFile = File(...)):
     generate_shap(model, image_path, shap_path)
 
     return templates.TemplateResponse(
+        request,
         "result1.html",
         {
-            "request": request,
             "label": label,
             "confidence": f"{confidence:.2f}",
             "image": image_path,

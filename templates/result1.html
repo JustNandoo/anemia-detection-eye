@@ -27,6 +27,44 @@
             margin: 6px 0;
         }
 
+        .audio-panel {
+            margin: 24px auto 0;
+            max-width: 520px;
+            background: #111;
+            padding: 18px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.35);
+        }
+
+        .audio-panel p {
+            margin: 0 0 12px;
+            color: #dbe7eb;
+            line-height: 1.5;
+        }
+
+        .audio-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        button {
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            background: #00ffb3;
+            color: #071214;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button.secondary {
+            background: transparent;
+            color: #00ffb3;
+            border: 1px solid #00ffb3;
+        }
+
         .images {
             display: flex;
             justify-content: center;
@@ -77,6 +115,10 @@
             .images {
                 flex-direction: column;
             }
+
+            .audio-actions {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -87,6 +129,17 @@
         <h1>🧠 Prediction Result</h1>
         <h2>Status: {{ label }}</h2>
         <h3>Confidence: {{ confidence }}%</h3>
+
+        <div class="audio-panel">
+            <p id="audioText">
+                Hasil klasifikasi menunjukkan status {{ label }} dengan confidence {{ confidence }} persen.
+                Sistem ini hanya alat bantu dan bukan pengganti diagnosis medis.
+            </p>
+            <div class="audio-actions">
+                <button id="playAudio" type="button">Putar Suara</button>
+                <button id="stopAudio" class="secondary" type="button">Stop Suara</button>
+            </div>
+        </div>
 
         <div class="images">
 
@@ -126,5 +179,41 @@
         </p>
 
     </div>
+
+    <script>
+        const playAudioButton = document.getElementById("playAudio");
+        const stopAudioButton = document.getElementById("stopAudio");
+        const audioText = document.getElementById("audioText").textContent.trim();
+
+        function speakResult() {
+            if (!("speechSynthesis" in window)) {
+                alert("Browser tidak mendukung fitur suara.");
+                return;
+            }
+
+            window.speechSynthesis.cancel();
+
+            const speech = new SpeechSynthesisUtterance(audioText);
+            speech.lang = "id-ID";
+            speech.rate = 0.95;
+            speech.pitch = 1;
+
+            window.speechSynthesis.speak(speech);
+        }
+
+        playAudioButton.addEventListener("click", speakResult);
+
+        stopAudioButton.addEventListener("click", () => {
+            if ("speechSynthesis" in window) {
+                window.speechSynthesis.cancel();
+            }
+        });
+
+        window.addEventListener("beforeunload", () => {
+            if ("speechSynthesis" in window) {
+                window.speechSynthesis.cancel();
+            }
+        });
+    </script>
 </body>
 </html>
