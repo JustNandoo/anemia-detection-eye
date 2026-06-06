@@ -114,8 +114,8 @@ Eye-Anemia-Detection/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/manepallijayapravallika/Eye-Anemia-Detection.git
-cd Eye-Anemia-Detection
+git clone https://github.com/JustNandoo/anemia-detection-eye.git
+cd anemia-detection-eye
 ```
 
 ### 2. Create Virtual Environment

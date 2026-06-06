@@ -1,35 +1,162 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-    <title>Error</title>
+    <title>{{ title or "Upload Error" }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
+        :root {
+            --bg: #f4fbf9;
+            --surface: #ffffff;
+            --primary: #00a884;
+            --primary-dark: #087864;
+            --ink: #102a2d;
+            --muted: #647b7e;
+            --line: #dbecea;
+            --danger: #e85d5d;
+            --danger-soft: #fff0f0;
+            --shadow: 0 24px 70px rgba(16, 42, 45, 0.18);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            font-family: Arial;
-            color: white;
+            min-height: 100vh;
+            margin: 0;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            font-family: Arial, Helvetica, sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 12% 12%, rgba(0, 168, 132, 0.16), transparent 30%),
+                radial-gradient(circle at 92% 8%, rgba(80, 180, 210, 0.18), transparent 26%),
+                linear-gradient(180deg, #f7fffd 0%, var(--bg) 100%);
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(9, 31, 34, 0.32);
+            backdrop-filter: blur(12px);
+        }
+
+        .modal {
+            position: relative;
+            z-index: 1;
+            width: min(460px, 100%);
+            overflow: hidden;
+            padding: 30px;
+            border: 1px solid rgba(232, 93, 93, 0.18);
+            border-radius: 26px;
+            background: var(--surface);
+            box-shadow: var(--shadow);
             text-align: center;
-            padding: 60px;
+            animation: popIn 0.28s ease both;
         }
-        .box {
-            background: #111;
-            padding: 40px;
-            border-radius: 14px;
-            max-width: 500px;
-            margin: auto;
+
+        .modal::before {
+            content: "";
+            position: absolute;
+            inset: 0 0 auto;
+            height: 7px;
+            background: linear-gradient(90deg, var(--danger), #ffb084, var(--primary));
         }
+
+        .icon {
+            width: 76px;
+            height: 76px;
+            display: grid;
+            place-items: center;
+            margin: 4px auto 18px;
+            border-radius: 24px;
+            background: var(--danger-soft);
+            color: var(--danger);
+            font-size: 38px;
+            font-weight: 900;
+        }
+
+        h1 {
+            margin: 0 0 12px;
+            font-size: 28px;
+            line-height: 1.15;
+        }
+
+        p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 16px;
+            line-height: 1.65;
+        }
+
+        .hint {
+            margin-top: 16px;
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: #fbfffe;
+            color: var(--primary-dark);
+            font-size: 14px;
+            font-weight: 700;
+        }
+
         a {
-            display: inline-block;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            min-height: 48px;
             margin-top: 20px;
-            color: #00ffb3;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--primary), #0fbea1);
+            color: white;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 800;
+            box-shadow: 0 12px 24px rgba(0, 168, 132, 0.24);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 32px rgba(0, 168, 132, 0.28);
+        }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: scale(0.94) translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @media (max-width: 520px) {
+            body {
+                padding: 16px;
+            }
+
+            .modal {
+                padding: 24px 18px;
+                border-radius: 22px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="box">
-        <h2>{{ message }}</h2>
-        <a href="/">⬅ Go Back</a>
-    </div>
+    <div class="overlay"></div>
+    <main class="modal" role="dialog" aria-modal="true" aria-labelledby="errorTitle">
+        <div class="icon">!</div>
+        <h1 id="errorTitle">{{ title or "Mohon Maaf" }}</h1>
+        <p>{{ message | safe }}</p>
+        <div class="hint">Gunakan foto close-up area mata dengan pencahayaan cukup.</div>
+        <a href="/">Upload Ulang</a>
+    </main>
 </body>
 </html>

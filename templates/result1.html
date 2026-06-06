@@ -1,122 +1,410 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <title>Prediction Result</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <style>
-        body {
-            margin: 0;
-            padding: 40px;
-            font-family: Arial, Helvetica, sans-serif;
-            color: white;
-            text-align: center;
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+        :root {
+            --bg: #f4fbf9;
+            --surface: #ffffff;
+            --primary: #00a884;
+            --primary-dark: #087864;
+            --mint: #e2f8f2;
+            --ink: #102a2d;
+            --muted: #62787b;
+            --line: #dbecea;
+            --warning: #f4a62a;
+            --danger: #e85d5d;
+            --success: #00a884;
+            --shadow: 0 20px 55px rgba(16, 42, 45, 0.14);
         }
 
-        .container {
-            max-width: 1000px;
-            margin: auto;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 10% 4%, rgba(0, 168, 132, 0.16), transparent 30%),
+                radial-gradient(circle at 90% 2%, rgba(73, 199, 217, 0.18), transparent 26%),
+                linear-gradient(180deg, #f7fffd 0%, var(--bg) 100%);
+        }
+
+        .page {
+            width: min(1180px, 100%);
+            margin: 0 auto;
+            padding: 28px 20px 44px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            color: var(--primary-dark);
+        }
+
+        .brand-mark {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            border-radius: 14px;
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 12px 24px rgba(0, 168, 132, 0.28);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 42px;
+            padding: 0 16px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            color: var(--primary-dark);
+            background: rgba(255, 255, 255, 0.78);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 360px;
+            gap: 24px;
+            align-items: stretch;
+            margin-bottom: 24px;
+        }
+
+        .result-card,
+        .audio-card,
+        .tips-card,
+        .image-card,
+        .notice {
+            border: 1px solid rgba(0, 168, 132, 0.14);
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.92);
+            box-shadow: var(--shadow);
+        }
+
+        .result-card {
+            position: relative;
+            overflow: hidden;
+            padding: 28px;
+            animation: riseIn 0.65s ease both;
+        }
+
+        .result-card::before {
+            content: "";
+            position: absolute;
+            inset: 0 0 auto;
+            height: 7px;
+            background: linear-gradient(90deg, var(--primary), #49c7d9, #9ce8c8);
+        }
+
+        .eyebrow {
+            margin: 8px 0 10px;
+            color: var(--primary-dark);
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
         }
 
         h1 {
-            margin-bottom: 10px;
+            margin: 0;
+            font-size: clamp(32px, 5vw, 52px);
+            line-height: 1.06;
         }
 
-        h2, h3 {
-            margin: 6px 0;
+        .summary {
+            margin: 16px 0 24px;
+            color: var(--muted);
+            font-size: 16px;
+            line-height: 1.65;
         }
 
-        .audio-panel {
-            margin: 24px auto 0;
-            max-width: 520px;
-            background: #111;
-            padding: 18px;
-            border-radius: 12px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.35);
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
         }
 
-        .audio-panel p {
-            margin: 0 0 12px;
-            color: #dbe7eb;
-            line-height: 1.5;
+        .metric {
+            padding: 16px;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            background: #fbfffe;
+        }
+
+        .metric span {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .metric strong {
+            display: block;
+            font-size: 24px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 9px 13px;
+            border-radius: 999px;
+            background: {% if label == "Anemic" %}#fff1ee{% else %}#e4f8f1{% endif %};
+            color: {% if label == "Anemic" %}#b84432{% else %}#087864{% endif %};
+            font-weight: 800;
+        }
+
+        .audio-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px;
+            animation: riseIn 0.75s ease both;
+        }
+
+        .audio-icon {
+            width: 58px;
+            height: 58px;
+            display: grid;
+            place-items: center;
+            border-radius: 18px;
+            background: var(--mint);
+            color: var(--primary-dark);
+            font-size: 24px;
+            animation: pulse 1.8s ease-in-out infinite;
+        }
+
+        .audio-card h2,
+        .tips-card h2,
+        .notice h2 {
+            margin: 16px 0 8px;
+            font-size: 22px;
+        }
+
+        .audio-card p,
+        .notice p {
+            margin: 0 0 16px;
+            color: var(--muted);
+            line-height: 1.55;
         }
 
         .audio-actions {
             display: grid;
             grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .button {
+            min-height: 46px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--primary), #0fbea1);
+            color: white;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 12px 24px rgba(0, 168, 132, 0.24);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 32px rgba(0, 168, 132, 0.28);
+        }
+
+        .button.secondary {
+            background: #effbf8;
+            color: var(--primary-dark);
+            border: 1px solid #bbe5df;
+            box-shadow: none;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+            gap: 24px;
+            align-items: start;
+        }
+
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .image-card {
+            overflow: hidden;
+            padding: 14px;
+            animation: riseIn 0.7s ease both;
+        }
+
+        .image-card h3 {
+            margin: 4px 2px 12px;
+            font-size: 16px;
+        }
+
+        .image-card img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 16px;
+            background: #eaf3f2;
+        }
+
+        .image-card p {
+            margin: 10px 2px 2px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .tips-card {
+            padding: 24px;
+            animation: riseIn 0.8s ease both;
+        }
+
+        .tips-card > p {
+            margin: 0 0 18px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .steps {
+            display: grid;
             gap: 12px;
         }
 
-        button {
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            background: #00ffb3;
-            color: #071214;
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
+        .step {
+            display: grid;
+            grid-template-columns: 38px minmax(0, 1fr);
+            gap: 12px;
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: #fbfffe;
         }
 
-        button.secondary {
-            background: transparent;
-            color: #00ffb3;
-            border: 1px solid #00ffb3;
-        }
-
-        .images {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 40px;
-            margin-top: 30px;
-        }
-
-        .box {
-            background: #111;
-            padding: 20px;
-            border-radius: 14px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.4);
-        }
-
-        .box h3 {
-            margin-bottom: 12px;
-        }
-
-        /* 🔑 SAME SIZE FOR BOTH IMAGES */
-        .box img {
-            width: 280px;
-            height: 280px;
-            object-fit: cover;
+        .step-number {
+            width: 38px;
+            height: 38px;
+            display: grid;
+            place-items: center;
             border-radius: 12px;
-            background: black;
+            background: var(--mint);
+            color: var(--primary-dark);
+            font-weight: 900;
         }
 
-        .note {
-            font-size: 12px;
-            opacity: 0.7;
-            margin-top: 6px;
+        .step strong {
+            display: block;
+            margin-bottom: 5px;
         }
 
-        a {
-            display: inline-block;
-            margin-top: 30px;
-            text-decoration: none;
-            color: #00ffb3;
-            font-weight: bold;
+        .step span {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.5;
         }
 
-        a:hover {
-            text-decoration: underline;
+        .notice {
+            margin-top: 24px;
+            padding: 22px;
+            border-color: #f3d6a5;
+            background: #fffaf0;
+            box-shadow: none;
         }
 
-        @media (max-width: 768px) {
-            .images {
+        .notice h2 {
+            margin-top: 0;
+            color: #8a5a11;
+        }
+
+        .notice p {
+            margin-bottom: 0;
+        }
+
+        @keyframes riseIn {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(0, 168, 132, 0.2);
+            }
+            50% {
+                transform: scale(1.04);
+                box-shadow: 0 0 0 10px rgba(0, 168, 132, 0);
+            }
+        }
+
+        @media (max-width: 980px) {
+            .hero,
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .image-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 640px) {
+            .page {
+                padding: 18px 14px 32px;
+            }
+
+            .topbar {
+                align-items: flex-start;
                 flex-direction: column;
             }
 
+            .result-card,
+            .audio-card,
+            .tips-card,
+            .notice {
+                border-radius: 20px;
+                padding: 18px;
+            }
+
+            .metrics,
+            .image-grid,
             .audio-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .step {
                 grid-template-columns: 1fr;
             }
         }
@@ -124,70 +412,174 @@
 </head>
 
 <body>
-    <div class="container">
+    <main class="page">
+        <header class="topbar">
+            <div class="brand">
+                <div class="brand-mark">+</div>
+                <span>Eye Anemia Detection</span>
+            </div>
+            <a class="back-link" href="/">Predict Another Image</a>
+        </header>
 
-        <h1>🧠 Prediction Result</h1>
-        <h2>Status: {{ label }}</h2>
-        <h3>Confidence: {{ confidence }}%</h3>
+        <section class="hero">
+            <div class="result-card">
+                <p class="eyebrow">Prediction result</p>
+                <h1>Hasil klasifikasi berhasil dianalisis.</h1>
+                <p class="summary">
+                    Model memberikan estimasi berdasarkan citra mata yang diunggah. Hasil ini bersifat
+                    alat bantu screening dan perlu dikonfirmasi dengan pemeriksaan medis bila ada gejala.
+                </p>
 
-        <div class="audio-panel">
-            <p id="audioText">
-                Hasil klasifikasi menunjukkan status {{ label }} dengan confidence {{ confidence }} persen.
-                Sistem ini hanya alat bantu dan bukan pengganti diagnosis medis.
+                <div class="metrics">
+                    <div class="metric">
+                        <span>Status</span>
+                        <strong class="status-pill">{{ label }}</strong>
+                    </div>
+                    <div class="metric">
+                        <span>Confidence</span>
+                        <strong>{{ confidence }}%</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="audio-card">
+                <div>
+                    <div class="audio-icon">♪</div>
+                    <h2>Audio Result</h2>
+                    <p id="audioText">
+                        Hasil klasifikasi menunjukkan status {{ label }} dengan tingkat confidence {{ confidence }} persen.
+                        {% if label == "Anemic" %}
+                        Disarankan untuk memperhatikan gejala seperti mudah lelah, pusing, pucat, sesak napas, atau jantung berdebar, lalu konsultasi dengan tenaga kesehatan untuk pemeriksaan lanjutan.
+                        {% else %}
+                        Tetap jaga pola makan bergizi, cukupi kebutuhan zat besi, vitamin B12, folat, dan lakukan pemeriksaan kesehatan bila muncul gejala.
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="audio-actions">
+                    <button id="replayAudio" class="button" type="button">Ulangi Suara</button>
+                    <button id="stopAudio" class="button secondary" type="button">Stop</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-grid">
+            <div class="image-grid">
+                <div class="image-card">
+                    <h3>Uploaded Image</h3>
+                    <img src="/{{ image }}" alt="Uploaded Image">
+                    <p>Gambar input yang digunakan untuk proses klasifikasi.</p>
+                </div>
+
+                {% if gradcam %}
+                <div class="image-card">
+                    <h3>Grad-CAM++</h3>
+                    <img src="/{{ gradcam }}" alt="Grad-CAM Image">
+                    <p>Area visual yang paling memengaruhi keputusan model.</p>
+                </div>
+                {% endif %}
+
+                {% if shap_explainer %}
+                <div class="image-card">
+                    <h3>SHAP Explanation</h3>
+                    <img src="/{{ shap_explainer }}" alt="SHAP Explanation">
+                    <p>Kontribusi piksel terhadap prediksi model.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <aside class="tips-card">
+                {% if label == "Anemic" %}
+                <h2>Langkah Awal Jika Terdeteksi Anemic</h2>
+                <p>
+                    Gunakan hasil ini sebagai sinyal awal. Diagnosis anemia tetap membutuhkan pemeriksaan
+                    seperti hemoglobin, ferritin, zat besi, vitamin B12, atau folat sesuai arahan dokter.
+                </p>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div>
+                            <strong>Amati gejala</strong>
+                            <span>Catat mudah lelah, pusing, pucat, sesak napas, nyeri dada, jantung berdebar, atau tangan dan kaki dingin.</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div>
+                            <strong>Perbaiki asupan bergizi</strong>
+                            <span>Konsumsi makanan kaya zat besi seperti daging, ikan, telur, kacang-kacangan, sayuran hijau, serta sumber vitamin C untuk membantu penyerapan.</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div>
+                            <strong>Jangan asal minum suplemen</strong>
+                            <span>Suplemen zat besi sebaiknya dikonsumsi setelah konsultasi karena kelebihan zat besi dapat berbahaya.</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div>
+                            <strong>Konsultasi ke dokter</strong>
+                            <span>Segera periksa bila gejala mengganggu aktivitas, sesak, nyeri dada, pingsan, menstruasi sangat berat, atau hasil screening berulang menunjukkan Anemic.</span>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <h2>Tips Menjaga Kondisi Tetap Non-Anemic</h2>
+                <p>
+                    Hasil Non-Anemic adalah sinyal baik, tetapi tetap perlu menjaga nutrisi dan memantau
+                    gejala karena anemia dapat dipengaruhi pola makan, perdarahan, atau kondisi kesehatan lain.
+                </p>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div>
+                            <strong>Jaga makanan seimbang</strong>
+                            <span>Penuhi zat besi, vitamin B12, folat, protein, dan vitamin C dari makanan sehari-hari.</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div>
+                            <strong>Perhatikan tanda tubuh</strong>
+                            <span>Jika muncul lelah berlebihan, pusing, pucat, sesak, atau jantung berdebar tanpa sebab jelas, lakukan pemeriksaan.</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div>
+                            <strong>Kelola faktor risiko</strong>
+                            <span>Perhatikan menstruasi berat, pola makan sangat terbatas, riwayat perdarahan, atau penyakit kronis yang dapat meningkatkan risiko anemia.</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div>
+                            <strong>Cek berkala bila perlu</strong>
+                            <span>Pemeriksaan darah berkala membantu memastikan kadar hemoglobin dan nutrisi penting tetap aman.</span>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </aside>
+        </section>
+
+        <section class="notice">
+            <h2>Catatan Penting</h2>
+            <p>
+                Sistem ini dibuat untuk kebutuhan edukasi dan screening awal mahasiswa. Hasil aplikasi
+                bukan diagnosis medis dan tidak menggantikan pemeriksaan dokter atau pemeriksaan laboratorium.
             </p>
-            <div class="audio-actions">
-                <button id="playAudio" type="button">Putar Suara</button>
-                <button id="stopAudio" class="secondary" type="button">Stop Suara</button>
-            </div>
-        </div>
-
-        <div class="images">
-
-            <!-- Uploaded Image -->
-            <div class="box">
-                <h3>Uploaded Image</h3>
-                <img src="/{{ image}}" alt="Uploaded Image">
-            </div>
-
-            <!-- Grad-CAM -->
-            {% if gradcam %}
-            <div class="box">
-                <h3>Grad-CAM++ (Explainable AI)</h3>
-                <img src="/{{ gradcam }}" alt="Grad-CAM Image">
-                <div class="note">
-                    Highlighted regions influenced the model’s decision
-                </div>
-            </div>
-            {% endif %}
-
-            {% if shap_explainer %}
-            <div class="box">
-                <h3>SHAP Explanation</h3>
-                <img src="/{{ shap_explainer }}">
-                <div class="note">
-                    Pixel-level contribution to prediction
-                </div>
-            </div>
-            {% endif %}
-
-
-        </div>
-
-        <a href="/">🔁 Predict Another Image</a>
-        <p style="font-size:20px; opacity:1.5;">
-        🚨⚠️This system is an assistive tool and not a substitute for medical diagnosis.
-        </p>
-
-    </div>
+        </section>
+    </main>
 
     <script>
-        const playAudioButton = document.getElementById("playAudio");
+        const replayAudioButton = document.getElementById("replayAudio");
         const stopAudioButton = document.getElementById("stopAudio");
-        const audioText = document.getElementById("audioText").textContent.trim();
+        const audioText = document.getElementById("audioText").textContent.replace(/\s+/g, " ").trim();
 
         function speakResult() {
             if (!("speechSynthesis" in window)) {
-                alert("Browser tidak mendukung fitur suara.");
                 return;
             }
 
@@ -195,13 +587,17 @@
 
             const speech = new SpeechSynthesisUtterance(audioText);
             speech.lang = "id-ID";
-            speech.rate = 0.95;
+            speech.rate = 0.94;
             speech.pitch = 1;
 
             window.speechSynthesis.speak(speech);
         }
 
-        playAudioButton.addEventListener("click", speakResult);
+        window.addEventListener("load", () => {
+            setTimeout(speakResult, 700);
+        });
+
+        replayAudioButton.addEventListener("click", speakResult);
 
         stopAudioButton.addEventListener("click", () => {
             if ("speechSynthesis" in window) {
