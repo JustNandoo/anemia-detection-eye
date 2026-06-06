@@ -80,4 +80,4 @@ model.fit(
 
 os.makedirs("model", exist_ok=True)
 model.save("model/eye_anemia_model.keras")
-print("✅ Model saved successfully")
+print("Model saved successfully")

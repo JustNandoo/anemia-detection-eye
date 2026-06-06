@@ -49,21 +49,12 @@
         .brand {
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-weight: 800;
-            letter-spacing: 0.2px;
-            color: var(--primary-dark);
         }
 
-        .brand-mark {
-            width: 42px;
-            height: 42px;
-            display: grid;
-            place-items: center;
-            border-radius: 14px;
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 12px 24px rgba(0, 168, 132, 0.28);
+        .brand-logo {
+            width: min(360px, 72vw);
+            height: auto;
+            display: block;
         }
 
         .badge {
@@ -418,6 +409,10 @@
                 flex-direction: column;
             }
 
+            .brand-logo {
+                width: min(300px, 86vw);
+            }
+
             .mini-grid {
                 grid-template-columns: 1fr;
             }
@@ -441,8 +436,7 @@
     <main class="page">
         <header class="topbar">
             <div class="brand">
-                <div class="brand-mark">+</div>
-                <span>Eye Anemia Detection</span>
+                <img class="brand-logo" src="/assets/logo.png" alt="Eye Anemia Detection">
             </div>
             <div class="badge">AI health screening</div>
         </header>
@@ -451,8 +445,7 @@
             <div class="hero-copy">
                 <h1>Screening anemia dari citra mata, lebih cepat dan mudah.</h1>
                 <p class="lead">
-                    Unggah gambar atau ambil foto langsung dari kamera. Sistem akan membantu
-                    mengklasifikasikan hasil dan menampilkan visual explainable AI.
+                   Unggah atau ambil foto mata Anda, lalu sistem computer vision akan menganalisis citra untuk membantu mendeteksi indikasi awal anemia secara cepat dan mudah.
                 </p>
                 <div class="mini-grid">
                     <div class="mini-card">

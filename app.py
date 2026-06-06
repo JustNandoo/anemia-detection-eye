@@ -15,6 +15,7 @@ from PIL import Image, UnidentifiedImageError
 app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 templates = Jinja2Templates(directory="templates")
 
 # Model Loading
@@ -181,7 +182,7 @@ async def predict(request: Request, file: UploadFile = File(...)):
 
     return templates.TemplateResponse(
         request,
-        "result1.html",
+        "result.html",
         {
             "label": label,
             "confidence": f"{confidence:.2f}",

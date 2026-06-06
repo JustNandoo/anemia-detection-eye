@@ -53,20 +53,12 @@
         .brand {
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-weight: 800;
-            color: var(--primary-dark);
         }
 
-        .brand-mark {
-            width: 42px;
-            height: 42px;
-            display: grid;
-            place-items: center;
-            border-radius: 14px;
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 12px 24px rgba(0, 168, 132, 0.28);
+        .brand-logo {
+            width: min(360px, 72vw);
+            height: auto;
+            display: block;
         }
 
         .back-link {
@@ -390,6 +382,10 @@
                 flex-direction: column;
             }
 
+            .brand-logo {
+                width: min(300px, 86vw);
+            }
+
             .result-card,
             .audio-card,
             .tips-card,
@@ -415,8 +411,7 @@
     <main class="page">
         <header class="topbar">
             <div class="brand">
-                <div class="brand-mark">+</div>
-                <span>Eye Anemia Detection</span>
+                <img class="brand-logo" src="/assets/logo.png" alt="Eye Anemia Detection">
             </div>
             <a class="back-link" href="/">Predict Another Image</a>
         </header>
