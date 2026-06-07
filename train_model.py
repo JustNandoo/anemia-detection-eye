@@ -10,7 +10,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.callbacks import EarlyStopping
 
 IMAGE_SIZE = 224
-DATASET_PATH = "dataset"
+DATASET_PATH = "data"
 
 def load_data():
     X, y = [], []
@@ -27,7 +27,7 @@ def load_data():
             y.append(label)
     return np.array(X), np.array(y)
 
-print("Loading dataset...")
+print("Loading data...")
 X, y = load_data()
 
 X_train, X_test, y_train, y_test = train_test_split(
@@ -68,7 +68,7 @@ early_stop = EarlyStopping(
     restore_best_weights=True
 )
 
-print("Training model...")
+print("Training model_hasil...")
 model.fit(
     X_train, y_train,
     epochs=30,
@@ -78,6 +78,6 @@ model.fit(
     callbacks=[early_stop]
 )
 
-os.makedirs("model", exist_ok=True)
-model.save("model/eye_anemia_model.keras")
+os.makedirs("model_hasil", exist_ok=True)
+model.save("model_hasil/eye_anemia_model.keras")
 print("Model saved successfully")

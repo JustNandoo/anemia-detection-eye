@@ -19,8 +19,8 @@ app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 templates = Jinja2Templates(directory="templates")
 
 # Model Loading
-model = tf.keras.models.load_model("model/best_model_mobileNetV2.keras")
-# model = tf.keras.models.load_model("model/fire_today_2.keras")
+model = tf.keras.models.load_model("model_hasil/best_model_mobileNetV2.keras")
+# model_hasil = tf.keras.models.load_model("model_hasil/fire_today_2.keras")
 
 
 UPLOAD_DIR = "/tmp/uploads" if os.environ.get("VERCEL") else "static/uploads"
